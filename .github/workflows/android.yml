@@ -1,0 +1,38 @@
+name: Fikra Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: unzip -o fikra_app_ready_for_flutter_create.zip
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Create Android platform
+        working-directory: fikra_app
+        run: flutter create . --project-name fikra --org com.fikra.app
+
+      - name: Install dependencies
+        working-directory: fikra_app
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: fikra_app
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fikra-Android-APK
+          path: fikra_app/build/app/outputs/flutter-apk/app-release.apk
